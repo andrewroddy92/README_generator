@@ -1,8 +1,8 @@
-// TODO: Include packages needed for this application
 const inquirer = require('inquirer');
 const Choices = require('inquirer/lib/objects/choices');
+const fs = require('fs')
 
-// TODO: Create an array of questions for user input
+
 const questions = [{
         type: 'input',
         name: 'projectTitle',
@@ -36,14 +36,14 @@ const questions = [{
     },
     {
         type: 'input',
-        name: 'collaberators',
-        message: 'Name any fellow collaberators in this project\'s creation',
+        name: 'collaborators',
+        message: 'Name any fellow collaborators in this project\'s creation',
         when: (answers) => answers.credits
     },
     {
         type: 'list',
         name: 'license',
-        message: 'Which liecense did you use?',
+        message: 'Which license did you use?',
         choices: ['MIT', 'GNU LV3', 'Apache License 2.0', 'ISC License'],
     },
     {
@@ -63,14 +63,42 @@ const questions = [{
     },
 ];
 
-// TODO: Create a function to write README file
-function writeToFile(fileName, data) {}
 
-// TODO: Create a function to initialize app
+
+function writeToFile(fileName, answers) {
+    var licenseBadge = ' ';
+    switch (answers.license){
+        case 'MIT':
+             licenseBadge = '[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)'
+        case 'GNU LV3':
+             licenseBadge = '[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)'
+        case 'Apache License 2.0':
+             licenseBadge = '[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)'
+        case 'ISC License':
+             licenseBadge = '[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)'
+    }
+    var markdownString = '# ' + answers.projectTitle + '\n\n' 
+    + licenseBadge + '\n\n' 
+    + '## Description' + '\n' + answers.projectDescription + '\n\n'
+    + '## Instillation' + '\n' + answers.projectInstallation + '\n\n'
+    + '## Usage' + '\n' + answers.projectUsage + '\n\n' 
+    + '!' + '[' + answers.altText + ']' + '(' + answers.screenshotFilePath + ')' + '\n\n'
+    + '## Credits' + '\n' + answers.collaborators + '\n\n'
+    + '## License' + '\n' + answers.license + '\n\n' 
+    + '##Find me on Github' + 'https://github.com/' + answers.githubUserName + '\n\n' 
+    + '## Contribution Guidelines' + '\n' + answers.contributing + '\n\n'
+    + '## Testing Instructions' + '\n' + answers.testInstructions + '\n\n'
+
+    fs.writeFile(fileName, markdownString, function (err) {
+        if (err) return console.log(err);
+      })
+}
+
 function init() {
     inquirer.prompt(questions).then((answers) => {
-        console.log('\nThis is everything:');
-        console.log(JSON.stringify(answers, null, '  '));
+        writeToFile('README.md', answers);
+        // console.log('\nThis is everything:');
+        // console.log(JSON.stringify(answers, null, '  '));
     });
 }
 
